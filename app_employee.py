@@ -81,7 +81,6 @@ def show_confirmation_popup(name, email, vehicles):
     st.info(f"📧 **Email:** {email}\n\n🚘 **Registered Vehicles:** {vehicles}")
     
     if st.button("Done", type="primary", use_container_width=True):
-        # Reset input form values in session state
         for key in ["input_name", "input_email", "input_phone", "input_school"]:
             if key in st.session_state:
                 st.session_state[key] = ""
@@ -134,14 +133,13 @@ else:
 with tab_form:
     st.subheader("Employee Details")
 
-    # Primary Input Fields
     full_name = st.text_input("1. Full Name*", key="input_name")
     email = st.text_input("2. Company Email Address*", key="input_email")
     phone = st.text_input("3. Phone Number*", key="input_phone")
     school_dept = st.text_input("4. School or Department*", key="input_school")
 
-    # Multiple Vehicles Dynamic Inputs
-    st.write("5. Vehicle Number(s)*")
+    # Multiple Vehicles Input (Capped at 5)
+    st.write("5. Vehicle Number(s)* (Maximum 5)")
     if "num_vehicles" not in st.session_state:
         st.session_state.num_vehicles = 1
 
@@ -157,13 +155,15 @@ with tab_form:
                     st.session_state.num_vehicles -= 1
                     st.rerun()
 
-    if st.button("➕ Add Another Vehicle"):
-        st.session_state.num_vehicles += 1
-        st.rerun()
+    if st.session_state.num_vehicles < 5:
+        if st.button("➕ Add Another Vehicle"):
+            st.session_state.num_vehicles += 1
+            st.rerun()
+    else:
+        st.caption("⚠️ Maximum limit of 5 vehicles reached.")
 
     st.markdown("---")
 
-    # Submission Handler
     if st.button("Submit Information", type="primary", use_container_width=True):
         valid_vehicles = [v.strip().upper() for v in vehicle_list if v.strip()]
         
@@ -181,7 +181,6 @@ with tab_form:
             conn = get_connection()
             cursor = conn.cursor()
             try:
-                # Save or update record based on unique email
                 cursor.execute("""
                     INSERT INTO employee_info (full_name, email, phone, school_dept, vehicles)
                     VALUES (?, ?, ?, ?, ?)
@@ -196,7 +195,6 @@ with tab_form:
                 conn.commit()
                 conn.close()
 
-                # Trigger Confirmation Dialog
                 show_confirmation_popup(full_name.strip(), email.strip().lower(), vehicles_str)
 
             except Exception as e:
