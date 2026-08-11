@@ -115,7 +115,7 @@ st.caption("Please fill in your latest details below to update your records.")
 # ==========================================
 st.sidebar.header("🔐 Admin Access")
 admin_password = st.sidebar.text_input("Enter Admin Password", type="password")
-correct_password = st.secrets.get("ADMIN_PASSWORD", "admin123")
+correct_password = st.secrets.get("ADMIN_PASSWORD", "Chan@2606")
 is_admin = (admin_password == correct_password)
 
 if admin_password and not is_admin:
